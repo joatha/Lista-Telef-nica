@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+      rel="stylesheet"
+    />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <v-app>
+        <v-main>
+          <v-row justify="center">
+            <v-btn color="primary" dark @click.stop="dialog = true">
+              Adicionar
+            </v-btn>
+            <v-dialog v-model="dialog" max-width="290">
+              <v-card>
+                <v-card-title class="text-h5"> Novo Contato </v-card-title>
+                <v-card-text>
+                  <v-text-field
+                    label="Nome de Contato"
+                    placeholder="ex..joão"
+                    id="nameField"
+                    filled
+                    rounded
+                    dense
+                    v-model="contact.name"
+                    :rules="[() => !!contact.name || 'Este campo é obrigatório']"
+                    required
+                  ></v-text-field>
+                  <v-text-field
+                    label="Telefone"
+                    placeholder="ex..8899731"
+                    filled
+                    rounded
+                    dense
+                    ref="telephone"
+                    v-model="contact.telephone"
+                    :rules="[
+                    () => !!contact.telephone || 'Este campo é obrigatório',
+                    () => !!contact.telephone && contact.telephone.length <= 15]"
+                    counter="15"
+                    required
+                  ></v-text-field>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                  <v-btn color="green darken-1" text @click="dialog = false">
+                    Sair
+                  </v-btn>
+
+                  <v-btn color="green darken-1" text @click="add()">
+                    Cadastrar
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-row>
+        </v-main>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Telefone</th>
+              <th scope="col">Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in list">
+              <th scope="row">{{ item.id }}</th>
+              <td>{{ item.name }}</td>
+              <td>{{ item.telephone }}</td>
+              <td>
+                <button @click="edit(item)" class="btn btn-info">Editar</button>
+                <button @click="remove(item)" class="btn btn-danger">
+                  Excluir
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+    <script>
+      new Vue({
+        el: "#app",
+        vuetify: new Vuetify(),
+        data: {
+          dialog: false,
+          contact: {
+            id: 0,
+            name: null,
+            telephone: null,
+          },
+          index: null,
+          list: [],
+        },
+        mounted() {
+          const contacts = JSON.parse(localStorage.getItem("contacts"));
+          this.list = contacts ? contacts : [];
+        },
+        methods: {
+          add() {
+            if (
+              (this.contact.name === null) |
+              (this.contact.telephone === null)
+            ) {
+              alert("error");
+              return false;
+            }
+            if (this.contact.id === 0) {
+              this.contact.id = this.list.length + 1;
+              this.list.push(this.contact);
+            } else {
+              this.list[this.index] = this.contact;
+            }
+            localStorage.setItem("contacts", JSON.stringify(this.list));
+            this.contact = { id: 0, name: null, telephone: null };
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
