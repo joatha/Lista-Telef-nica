@@ -37,14 +37,20 @@
                 <v-btn color="primary" dark @click.stop="dialog = true">
                   Adicionar
                 </v-btn>
-                <v-dialog v-model="dialog" max-width="290">
+                <v-dialog
+                  v-model="dialog"
+                  slot="activator"
+                  max-width="290"
+                  ref="myModel"
+                >
                   <v-card>
-                    <v-card-title class="text-h5"> Novo Contato </v-card-title>
+                    <v-card-title class="text-h5" v-if()>
+                      Novo Contato
+                    </v-card-title>
                     <v-card-text>
                       <v-text-field
                         label="Nome de Contato"
                         placeholder="ex..joão"
-                        id="nameField"
                         filled
                         rounded
                         dense
@@ -53,16 +59,18 @@
                         required
                       ></v-text-field>
                       <v-text-field
+                        v-mask="'(##)#####-####'"
                         label="Telefone"
+                        id="telefone"
                         placeholder="ex..8899731"
                         filled
                         rounded
                         dense
-                        ref="telephone"
                         v-model="contact.telephone"
                         :rules="[											
 												() => !!contact.telephone || 'Este campo é obrigatório',
-												() => !!contact.telephone && contact.telephone.length >= 15]"
+												() => !!contact.telephone && contact.telephone.length <= 15]"
+                        :maxlength="max"
                         counter="15"
                         required
                       ></v-text-field>
@@ -76,7 +84,11 @@
                       >
                         Sair
                       </v-btn>
-                      <v-btn color="green darken-1" text @click="add()">
+                      <v-btn
+                        color="green darken-1"
+                        text
+                        @click="add(), dialog = false"
+                      >
                         Cadastrar
                       </v-btn>
                     </v-card-actions>
@@ -100,7 +112,11 @@
                     <td>{{ item.name }}</td>
                     <td>{{ item.telephone }}</td>
                     <td>
-                      <button @click="edit(item)" class="btn btn-info">
+                      <button
+                        @click="edit(item)"
+                        @click.stop="dialog = true"
+                        class="btn btn-info"
+                      >
                         Editar
                       </button>
                       <button @click="remove()" class="btn btn-danger">
@@ -115,62 +131,64 @@
         </div>
       </v-app>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/v-mask/dist/v-mask.min.js"></script>
 
     <script>
-      new Vue({
-        el: "#app",
-        vuetify: new Vuetify(),
-        data: {
-          dialog: false,
-          contact: {
-            id: 0,
-            name: null,
-            telephone: null,
-          },
-          index: null,
-          list: [],
-        },
-        mounted() {
-          const contacts = JSON.parse(localStorage.getItem("contacts"));
-          this.list = contacts ? contacts : [];
-        },
-        methods: {
-          add() {
-            if (
-              (this.contact.name === null) |
-              (this.contact.telephone === null)
-            ) {
-              alert("error");
-              return false;
-            }
-            if (this.contact.id === 0) {
-              this.contact.id = this.list.length + 1;
-              this.list.push(this.contact);
-            } else {
-              this.list[this.index] = this.contact;
-            }
-            localStorage.setItem("contacts", JSON.stringify(this.list));
-            this.contact = { id: 0, name: null, telephone: null };
-          },
+      Vue.use(VueMask.VueMaskPlugin),
+        new Vue({
+          el: "#app",
+          vuetify: new Vuetify(),
+          data: {
+            dialog: false,
+            max: 15,
+            contact: {
+              id: 0,
+              name: null,
+              telephone: null,
+            },
 
-          remove(item) {
-            const idx = this.list.indexOf(item);
-            if (this.list.indexOf === false) {
-              alert("Deseja deletar?");
-            }
-            this.list.splice(idx, 1);
-            localStorage.setItem("contacts", JSON.stringify(this.list));
+            index: null,
+            list: [],
           },
-          edit(item) {
-            this.index = this.list.indexOf(item);
-            this.contact = Object.assign({}, item);
-            localStorage.setItem("contacts", JSON.stringify(this.list));
+          mounted() {
+            const contacts = JSON.parse(localStorage.getItem("contacts"));
+            this.list = contacts ? contacts : [];
           },
-        },
-      });
+          methods: {
+            add() {
+              if (
+                (this.contact.name === null) |
+                (this.contact.telephone === null)
+              ) {
+                alert("error");
+                return false;
+              }
+              if (this.contact.id === 0) {
+                this.contact.id = this.list.length + 1;
+                this.list.push(this.contact);
+              } else {
+                this.list[this.index] = this.contact;
+              }
+              localStorage.setItem("contacts", JSON.stringify(this.list));
+              this.contact = { id: 0, name: null, telephone: null };
+            },
+            remove(item) {
+              const idx = this.list.indexOf(item);
+              if (this.list.indexOf === false) {
+                alert("Deseja deletar?");
+              }
+              this.list.splice(idx, 1);
+              localStorage.setItem("contacts", JSON.stringify(this.list));
+            },
+            edit(item) {
+              this.index = this.list.indexOf(item);
+              this.contact = Object.assign({}, item);
+              localStorage.setItem("contacts", JSON.stringify(this.list));
+            },
+          },
+        });
     </script>
   </body>
 </html>
