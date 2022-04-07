@@ -28,13 +28,15 @@
     <div id="app">
       <v-app>
         <div class="d-flex justify-center mb-9">
-          <p class="d-flex justify-center">Lista de Contatos</p>
+          <p class="d-flex justify-center" >
+            <h1 style="padding-top: 20px"> Lista de Contatos</h1>
+          </p>
         </div>
         <div>
           <v-main>
             <div>
-              <v-row justify="center">
-                <v-btn color="primary" dark @click.stop="dialog = true">
+              <v-row justify="center" >
+                <v-btn color="primary" dark @click.stop="dialog = true" > 
                   Adicionar
                 </v-btn>
                 <v-dialog
@@ -50,16 +52,22 @@
                     <v-card-text>
                       <v-text-field
                         label="Nome de Contato"
+                        ref="name"
                         placeholder="ex..joão"
                         filled
                         rounded
                         dense
                         v-model="contact.name"
-                        :rules="[() => !!contact.name || 'Este campo é obrigatório']"
+                        :rules="[
+                        () => !!contact.name || 'Este campo é obrigatório',
+                        (value) =>contact.name.split(' ').every(val => val.length >= 3) 
+                        || 'Este campo deve ter mais de três letras'                      
+                        ]"
                         required
                       ></v-text-field>
                       <v-text-field
                         v-mask="'(##)#####-####'"
+                        ref="telephone"
                         label="Telefone"
                         id="telefone"
                         placeholder="ex..8899731"
@@ -81,6 +89,7 @@
                         color="green darken-1"
                         text
                         @click="dialog = false"
+                        typ
                       >
                         Sair
                       </v-btn>
@@ -96,8 +105,8 @@
                 </v-dialog>
               </v-row>
             </div>
-            <div>
-              <table class="table">
+            <div class="d-flex" style="padding-top: 20px">
+              <table class="table" >
                 <thead>
                   <tr>
                     <th scope="col">#</th>
@@ -143,20 +152,25 @@
           data: {
             dialog: false,
             max: 15,
+            ddd:11,
             contact: {
-              id: 0,
+              id: null,
               name: null,
               telephone: null,
-            },
-
+            },          
             index: null,
             list: [],
-          },
-          mounted() {
+          },   
+          watch:{
+            ddd(oldDDD, newDDD){
+
+            }
+          },     
+        mounted() {
             const contacts = JSON.parse(localStorage.getItem("contacts"));
             this.list = contacts ? contacts : [];
           },
-          methods: {
+          methods: {       
             add() {
               if (
                 (this.contact.name === null) |
@@ -165,20 +179,23 @@
                 alert("error");
                 return false;
               }
-              if (this.contact.id === 0) {
+              if( this.contact.telephone  == "(11)"){
+                console.log('deu certo')
+
+              }
+              if (this.contact.id === null) {
                 this.contact.id = this.list.length + 1;
-                this.list.push(this.contact);
+                this.list.push(this.contact);             
+                localStorage.setItem("contacts", JSON.stringify(this.list));
+                this.contact = { id: null, name: null, telephone: null };               
+               
               } else {
                 this.list[this.index] = this.contact;
-              }
-              localStorage.setItem("contacts", JSON.stringify(this.list));
-              this.contact = { id: 0, name: null, telephone: null };
+              }    
+                 
             },
             remove(item) {
               const idx = this.list.indexOf(item);
-              if (this.list.indexOf === false) {
-                alert("Deseja deletar?");
-              }
               this.list.splice(idx, 1);
               localStorage.setItem("contacts", JSON.stringify(this.list));
             },
@@ -186,7 +203,17 @@
               this.index = this.list.indexOf(item);
               this.contact = Object.assign({}, item);
               localStorage.setItem("contacts", JSON.stringify(this.list));
-            },
+            } ,            
+            DDD(item){     
+              if( this.contact.telephone  === '(11)'){
+               
+                console.log('deu certo')
+              }         
+              else{
+                console.log('deu errado')
+              }
+              
+            }
           },
         });
     </script>
