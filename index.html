@@ -146,9 +146,9 @@
                     >PORT LOUIS</a
                   ></strong
                 >
-                aqui foram usados os frameworks VueJS e Vuetify. Tendo em vista
-                o desafio e a oportunidade dada, fico extremamente feliz em
-                realiza-lo.
+                aqui foram usados os frameworks VueJS e Vuetify-Material Design
+                Framework. Tendo em vista o desafio e a oportunidade dada, fico
+                extremamente feliz em realiza-lo.
                 <br />
               </v-card-text>
               <v-divider></v-divider>
@@ -191,11 +191,8 @@
                 (this.contact.name === null) |
                 (this.contact.telephone === null)
               ) {
-                alert("error");
+                alert("Você não pode cadastrar com campos em branco!!!");
                 return false;
-              }
-              if (this.contact.telephone == "(11)") {
-                console.log("deu certo");
               }
               if (this.contact.id === 0) {
                 this.contact.id = this.list.length + 1;
